@@ -3,6 +3,7 @@
 namespace MLClientTest
 {
     using AzureMLClient.Authentication;
+    using AzureMLClient.Workspace;
     using Microsoft.Azure.Management.ResourceManager.Fluent;
     using Microsoft.Azure.Management.ResourceManager.Fluent.Authentication;
     using Microsoft.IdentityModel.Clients.ActiveDirectory;
@@ -24,6 +25,13 @@ namespace MLClientTest
             // Invoke the ML Client from here to test.
             var credentials = GetAzureMLCredentialFromServicePrincipalWithAutoTokenRefresh(azureTenantId, clientId, clientSecret, azureSubscriptionId);
 
+            var azuremlClient = new WorkspaceClient(credentials, WorkspaceClient.MicrosoftAzureTenantId);
+
+            var region = Microsoft.Azure.Management.ResourceManager.Fluent.Core.Region.Create("southcentralus");
+            var workspaceName = "sukovaladotnet";
+            var rgName = "sukovaladotnetRG";
+            var workspace = await azuremlClient.CreateWorkspaceAsync(region, workspaceName, Guid.Parse(azureSubscriptionId), rgName, workspaceName, createResourceGroup: true).ConfigureAwait(false);
+            Console.WriteLine(workspace);
         }
 
         static AzureMLServiceCredentials GetAzureMLCredentialFromServicePrincipalWithAutoTokenRefresh(

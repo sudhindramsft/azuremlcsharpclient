@@ -1,7 +1,4 @@
-﻿// <copyright file="AzureMLCredential.cs" company="Microsoft">
-// Copyright (c) Microsoft. All rights reserved.
-// </copyright>
-
+﻿
 namespace AzureMLClient.Authentication
 {
     using System;
@@ -12,7 +9,7 @@ namespace AzureMLClient.Authentication
 
     public class AzureMLServiceCredentials : ServiceClientCredentials
     {
-        public event WorkspaceHelper.AuthenticationCallback OnAuthenticate = null;
+        public event WorkspaceClient.AuthenticationCallback OnAuthenticate = null;
 
         /// <summary>
         /// TenantId
@@ -24,7 +21,7 @@ namespace AzureMLClient.Authentication
         /// </summary>
         public AzureEnvironment AzureEnvironment { get; private set; }
 
-        public AzureMLServiceCredentials(WorkspaceHelper.AuthenticationCallback authenticationCallback,
+        public AzureMLServiceCredentials(WorkspaceClient.AuthenticationCallback authenticationCallback,
             string tenantId,
             AzureEnvironment azureEnvironment)
         {
@@ -43,7 +40,7 @@ namespace AzureMLClient.Authentication
             }
 
             base.InitializeServiceClient(client);
-            if (client is WorkspaceHelper && client.HttpClient != null)
+            if (client is WorkspaceClient && client.HttpClient != null)
             {
                 HttpClient = client.HttpClient;
             }

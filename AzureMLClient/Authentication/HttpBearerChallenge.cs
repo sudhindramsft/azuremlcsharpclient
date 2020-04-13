@@ -1,7 +1,4 @@
-﻿// <copyright file="HttpBearerChallenge.cs" company="Microsoft">
-// Copyright (c) Microsoft. All rights reserved.
-// </copyright>
-
+﻿
 namespace AzureMLClient.Authentication
 {
     using System;
