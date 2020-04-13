@@ -197,6 +197,7 @@ namespace AzureMLClient.Workspace
             string keyVaultId,
             string azureContainerRegistryId,
             string storageId,
+            string friendlyName,
             string applicationInsightsId)
         {
             var res = new JObject
@@ -221,7 +222,7 @@ namespace AzureMLClient.Workspace
                         { "containerRegistry", azureContainerRegistryId },
                         { "keyVault", keyVaultId },
                         { "applicationInsights", applicationInsightsId },
-                        { "friendlyName", name },
+                        { "friendlyName", friendlyName },
                         { "storageAccount", storageId }
                     }
                 }

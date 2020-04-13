@@ -4,9 +4,12 @@ namespace MLClientTest
 {
     using AzureMLClient.Authentication;
     using AzureMLClient.Workspace;
+    using Microsoft.Azure.Management.MachineLearningServices.Models;
     using Microsoft.Azure.Management.ResourceManager.Fluent;
     using Microsoft.Azure.Management.ResourceManager.Fluent.Authentication;
     using Microsoft.IdentityModel.Clients.ActiveDirectory;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     class Program
     {
@@ -25,13 +28,41 @@ namespace MLClientTest
             // Invoke the ML Client from here to test.
             var credentials = GetAzureMLCredentialFromServicePrincipalWithAutoTokenRefresh(azureTenantId, clientId, clientSecret, azureSubscriptionId);
 
-            var azuremlClient = new WorkspaceClient(credentials, WorkspaceClient.MicrosoftAzureTenantId);
+            var azuremlClient = new WorkspaceClient(credentials, azureTenantId, azureSubscriptionId);
 
             var region = Microsoft.Azure.Management.ResourceManager.Fluent.Core.Region.Create("southcentralus");
-            var workspaceName = "sukovaladotnet";
-            var rgName = "sukovaladotnetRG";
-            var workspace = await azuremlClient.CreateWorkspaceAsync(region, workspaceName, Guid.Parse(azureSubscriptionId), rgName, workspaceName, createResourceGroup: true).ConfigureAwait(false);
-            Console.WriteLine(workspace);
+            var workspaceName = "sukovalaTestSDK";
+            var rgName = "sukovalaTestSDKRG";
+            var workspace = await azuremlClient.CreateOrGetWorkspaceAsync(region, workspaceName, rgName, workspaceName, createResourceGroup: true).ConfigureAwait(false);
+            var attachedCompute = await azuremlClient.AttachCompute(region.Name, rgName, workspaceName, computeName: "GPU-Compute", useGPUCompute: true);
+
+            Console.WriteLine(PrettyPrintWorkspace(workspace));
+            Console.ReadLine();
+        }
+
+        static string PrettyPrintWorkspace(Workspace workspace)
+        {
+            var strRepresentation = new JObject
+            {
+                { "Id", workspace.Id},
+                { "type", "Microsoft.MachineLearningServices/workspaces" },
+                { "name", workspace.Name },
+                { "apiVersion", "2020-03-01" },
+                { "location", workspace.Location },
+                {
+                    "properties",
+                    new JObject
+                    {
+                        {"sku", workspace.Sku.Name },
+                        { "StorageAccount", workspace.StorageAccount},
+                        { "KeyVault", workspace.KeyVault},
+                        { "AppInsights", workspace.ApplicationInsights },
+                        { "AzureContainerRegistry", workspace.ContainerRegistry },
+                    }
+                }
+            };
+
+            return strRepresentation.ToString(Formatting.Indented);
         }
 
         static AzureMLServiceCredentials GetAzureMLCredentialFromServicePrincipalWithAutoTokenRefresh(
